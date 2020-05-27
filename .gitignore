@@ -106,3 +106,7 @@ venv.bak/
 # OS stuff:
 .DS_Store
 .idea
+
+# CARPETAS A IGNORAR DE PROYECTO !!
+data/
+__trash__/
