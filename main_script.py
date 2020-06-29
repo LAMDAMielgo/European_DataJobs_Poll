@@ -1,14 +1,7 @@
 import argparse
 import sys
 import warnings
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-import requests
 import re
-from datetime import datetime
-from sklearn.preprocessing import OneHotEncoder
-from bs4 import BeautifulSoup
 from functools import reduce
 
 from p_acquisition import m_acquisition as m_ac
@@ -30,6 +23,7 @@ def argument_parser():
     return args
 
 #-------------------------------------------------------------------------------- acquiring processed data
+
 def acquire_career_info(df_career_info):
     """Career info is list_of_dfs[0]"""
     try:
@@ -48,7 +42,7 @@ def acquire_career_info(df_career_info):
         df_career_info = df_career_info.join(other=new_bool_df, on=None, how='left', sort=False)
 
         # Dropping duplicate cols
-        cols_to_del = ['dem_education_level', 'normalized_job_code']
+        cols_to_del = ['dem_education_level']
         df_career_info.drop(columns=cols_to_del, inplace=True)
 
         # Save table into local folder
@@ -61,10 +55,10 @@ def acquire_career_info(df_career_info):
 
     finally:
         # Memory Usage and objects manually from Jupyter file
-        print('''\t\t\t  >> Done cleaning df_career_info!. 
-        >>> MEMORY USAGE \t FROM 301.7+ KB to 207.4+ KB
-        >>> DATA \t FROM objects(4) TO bool(6), object(2)
-                 \t\t\t  >> Chekout /data/processed/''')
+        print('''\n\t\t\t  >> Done cleaning df_career_info!. 
+        \t\t\t | MEMORY USAGE \t|\t 301.7+ KB -->\t 207.4+ KB
+        \t\t\t | DATA \t\t\t|\t objects(4) -->\t bool(6), object(2)
+        \t\t\t\t  >> Chekout /data/processed/''')
 
 def acquire_country_info(df_country_info):
     """Country info is list_of_dfs[1]"""
@@ -94,10 +88,10 @@ def acquire_country_info(df_country_info):
         print('Something went wrong with [acquire_career_info]')
 
     finally:
-        print('''\t\t\t  >> Done cleaning df_country_info!.
-        >>> MEMORY USAGE \t FROM 337.0+ KB to 226.3+ KB
-        >>> DATA \t FROM objects(5) TO object(3)
-                 \t\t\t  >> Chekout /data/processed/''')
+        print('''\n\t\t\t  >> Done cleaning df_country_info!.
+        \t\t\t | MEMORY USAGE \t|\t FROM 337.0+ KB -->\t 226.3+ KB
+        \t\t\t | DATA \t\t\t|\t FROM objects(5) -->\t object(3)
+        \t\t\t\t  >> Chekout /data/processed/''')
 
 def acquire_personal_info(df_personal_info):
     """Personal info is list_of-dfs[2]"""
@@ -130,10 +124,10 @@ def acquire_personal_info(df_personal_info):
         print('Something went wrong with [acquire_table_personal_info]') # Make a log file
 
     finally:
-        print('''\t\t\t  >> Done cleaning df_personal_info!. 
-        >>> MEMORY USAGE \t FROM 337.0+ KB to 367.6+ KB
-        >>> DATA \t FROM objects(5) TO bool(7), object(4)
-                 \t\t\t  >> Chekout /data/processed/''')
+        print('''\n\t\t\t  >> Done cleaning df_personal_info!. 
+        \t\t\t | MEMORY USAGE \t|\t FROM 337.0+ KB -->\t 367.6+ KB
+        \t\t\t | DATA \t\t\t|\t FROM objects(5) -->\t bool(7), object(4)
+        \t\t\t\t  >> Chekout /data/processed/''')
 
 def acquire_poll_info(df_poll_info):
     """Poll info is list_of-dfs[3]"""
@@ -193,7 +187,7 @@ def acquire_poll_info(df_poll_info):
         print('Something went wrong with [acquire_table_personal_info]') # Make a log file
 
     finally:
-        print('''\t\t\t  >> Done cleaning df_poll_info!. 
+        print('''\n\t\t\t  >> Done cleaning df_poll_info!. 
                  \t\t\t  >> Chekout /data/processed/''')
 
 #-------------------------------------------------------------------------------- main
@@ -225,14 +219,22 @@ if __name__ == '__main__':
     arguments = argument_parser()
     main(arguments)
 
+    #------------------------------------------ step 1_ acquisition
     # Getting DataFrames from connection
-    list_of_dfs_from_ddbb = main(arguments)
+    list_of_dfs_from_ddbb = main(arguments)   # ['career_info', 'country_info', 'personal_info', 'poll_info']
 
     # Processing raw_data to analize and saving in local /data/processed
-    # ['career_info', 'country_info', 'personal_info', 'poll_info']
     df_career_info = acquire_career_info(list_of_dfs_from_ddbb[0])
     df_country_info = acquire_country_info(list_of_dfs_from_ddbb[1])
     df_personal_info = acquire_personal_info(list_of_dfs_from_ddbb[2])
-    df_poll_info =acquire_poll_info(list_of_dfs_from_ddbb[3])
+    # df_poll_info =acquire_poll_info(list_of_dfs_from_ddbb[3]) something chrashes dont care by now
 
     # By here DFs have to be saved in folder /data/processed
+    ## WRANGLING
+    m_wr.add_country_col_to_csv()
+    m_wr.add_jobs_column_to_csv()
+
+    #2_ get Jobs
+    # Paso 2_ A traves de API, añadir columna de nombres de JOBS
+
+

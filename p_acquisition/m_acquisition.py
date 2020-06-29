@@ -6,7 +6,8 @@ from datetime import datetime
 from sklearn.preprocessing import OneHotEncoder
 from functools import reduce
 
-#-------------------------------------------------------------------------------- functions for stablishing connection t ddbb
+
+#-------------------------------------------------------------------------------- functions for connection t ddbb
 
 def connect_to_table(ddbb):
     print(f'Creating DDBB connection..')
@@ -159,7 +160,7 @@ def get_uniqueResponses(serie, separator):
         if isinstance(separator, str):
             list_of_all_responses = set()
 
-            print(f' ··· Getting Unique values in [poll_column]')
+            print(f' ·· Getting Unique values in [poll_column]')
             flattened_list_of_responses = reduce(lambda x, y: x + y,
                                                  [item.split(separator) for item in serie.unique()])
 
@@ -236,4 +237,3 @@ def save_df_to_csv(df, path, name):
 
 def save_img_to_folder():
     pass
-
