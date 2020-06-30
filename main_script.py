@@ -6,7 +6,7 @@ from functools import reduce
 
 from p_acquisition import m_acquisition as m_ac
 from p_wrangling import m_wrangling as m_wr
-
+from p_analysis import m_analysis as m_an
 
 def argument_parser():
     """
@@ -206,7 +206,6 @@ def main(some_args):
 
 
 if __name__ == '__main__':
-
     """
     # Information ddbb
     year_ddbb = '2016'
@@ -214,12 +213,8 @@ if __name__ == '__main__':
     title = 'DATA JOBS BY GENDER ' + year_ddbb
     print(main(arguments)[0])  --> esto devuelve career_info, nos entendemos??
     """
-
-    # Using arguments
     arguments = argument_parser()
-    main(arguments)
-
-    #------------------------------------------ step 1_ acquisition
+    #------------------------------------------------------------------- step 1
     # Getting DataFrames from connection
     list_of_dfs_from_ddbb = main(arguments)   # ['career_info', 'country_info', 'personal_info', 'poll_info']
 
@@ -229,12 +224,9 @@ if __name__ == '__main__':
     df_personal_info = acquire_personal_info(list_of_dfs_from_ddbb[2])
     # df_poll_info =acquire_poll_info(list_of_dfs_from_ddbb[3]) something chrashes dont care by now
 
-    # By here DFs have to be saved in folder /data/processed
-    ## WRANGLING
+    #------------------------------------------------------------------- step 2
     m_wr.add_country_col_to_csv()
     m_wr.add_jobs_column_to_csv()
 
-    #2_ get Jobs
-    # Paso 2_ A traves de API, añadir columna de nombres de JOBS
 
 
