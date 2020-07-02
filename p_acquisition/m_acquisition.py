@@ -6,16 +6,13 @@ from datetime import datetime
 from sklearn.preprocessing import OneHotEncoder
 from functools import reduce
 
-
 #-------------------------------------------------------------------------------- functions for connection t ddbb
 
 def connect_to_table(ddbb):
     print(f'Creating DDBB connection..')
-    """In case it doesn't work : 'sqlite:////home/lucia/Descargas/raw_data_project_m1.db'"""
     engine = create_engine(f'sqlite:///{ddbb}')
     connection = engine.connect()
-    print(f'''Created connection with DDBB
-              Table names -> \t{engine.table_names()}''')
+
     return engine
 
 def ddbb_tables(engine):

@@ -1,5 +1,4 @@
 import re
-
 from p_acquisition import m_acquisition as m_ac
 
 #-------------------------------------------------------------------------------- cleaning and saving tables
@@ -30,6 +29,7 @@ def acquire_career_info(df_career_info):
                        path='data/processed',    # Function adds hierarchy of files
                        name=f'career_info')      # Name of csv
 
+        return df_career_info
     except:
         print('Something went wrong with [acquire_table_career_info]')
 
@@ -63,6 +63,8 @@ def acquire_country_info(df_country_info):
         m_ac.save_df_to_csv(df_country_info,
                        path='data/processed',    # Function adds hierarchy of files
                        name=f'country_info')     # Name of csv
+
+        return df_country_info
 
     except:
         print('Something went wrong with [acquire_career_info]')
@@ -98,7 +100,9 @@ def acquire_personal_info(df_personal_info):
         # Save table into local folder
         m_ac.save_df_to_csv(df_personal_info,
                        path='data/processed',    # Function adds hierarchy of files
-                       name=f'personal_info')    # Name of csv
+                       name='personal_info')    # Name of csv
+
+        return df_personal_info
 
     except:
         print('Something went wrong with [acquire_table_personal_info]') # Make a log file
@@ -109,63 +113,58 @@ def acquire_personal_info(df_personal_info):
         \t\t\t | DATA \t\t\t|\t FROM objects(5) -->\t bool(7), object(4)
         \t\t\t\t  >> Chekout /data/processed/''')
 
-def acquire_poll_info(df_poll_info):
+
+def get_serie_at_split_str_at_char(ser, char):
+    return [m_ac.split_str_at_char(response, char)
+                                   if re.search(char, response)
+                                   else response
+                                   for response in ser]
+
+def get_separate_df(serie_to_eval, separator_string, path_to_save_to, file_name):
+    """
+    INPUT   -> inputs to calls formentioned defs
+    OUTPUT  -> saves them into a common zip file and return a list of alls dfs
+    """
+    print(f'\t ···· Iterating through poll lists')
+    df_to_return = m_ac.multiple_choice_col_to_df( serie= serie_to_eval, separator= separator_string)
+    m_ac.save_df_to_csv(df_to_return,
+                        path=path_to_save_to,  # Function adds hierarchy of files
+                        name=file_name)  # Name of csv
+
+    return df_to_return
+
+def acquire_poll_info(df):
     """Poll info is list_of-dfs[3]"""
 
     sep = ' | '  # this could change
-    series = [
-        df_poll_info['question_bbi_2016wave4_basicincome_awareness'],
-        df_poll_info['question_bbi_2016wave4_basicincome_effect'],
-        df_poll_info['question_bbi_2016wave4_basicincome_vote'],
-        df_poll_info['question_bbi_2016wave4_basicincome_argumentsagainst'],
-        df_poll_info['question_bbi_2016wave4_basicincome_argumentsfor']
-        ]
+    cols = [
+        'question_bbi_2016wave4_basicincome_awareness',
+        'question_bbi_2016wave4_basicincome_effect',
+        'question_bbi_2016wave4_basicincome_vote',
+        'question_bbi_2016wave4_basicincome_argumentsagainst',
+        'question_bbi_2016wave4_basicincome_argumentsfor']
 
-    try:
-        print(f'\n\n· Cleaning df_poll_info ....')
-        # Deleting strange characters in column ------> this should be as a def in m_ac
-        df_poll_info['question_bbi_2016wave4_basicincome_effect'] = [m_ac.split_str_at_char(response, 'Û_ ')
-                                                                     if re.search('Û_ ', response)
-                                                                     else response
-                                                                     for response in df_poll_info[
-                                                                         'question_bbi_2016wave4_basicincome_effect']
-                                                                     ]
+    files_names = ['poll_basicincome_awareness',
+                   'poll_basicincome_effect',
+                   'poll_basicincome_vote',
+                   'poll_basicincome_argumentsagainst',
+                   'poll_basicincome_argumentsfor']
 
-        # Separating AWARENESS POLL -----------> me he quedado aquí
-        print(f'..Separating polls')
-        df_poll_basicincome_awareness = m_ac.multiple_choice_col_to_df(serie= series[0], separator= sep)
-        m_ac.save_df_to_csv(df_poll_basicincome_awareness,
-                       path='data/processed',                   # Function adds hierarchy of files
-                       name=f'poll_basicincome_awareness')      # Name of csv
+    print(f'\n\n· Cleaning df_poll_info ....')
 
-        df_poll_basicincome_effect = m_ac.multiple_choice_col_to_df(serie= series[1], separator= sep)
-        df_poll_basicincome_vote = m_ac.multiple_choice_col_to_df(serie= series[2], separator= sep)
-        df_poll_basicincome_argumentsagainst = m_ac.multiple_choice_col_to_df(serie= series[3], separator= sep)
-        df_poll_basicincome_argumentsfor = m_ac.multiple_choice_col_to_df(serie= series[5], separator= sep)
+    # Deleting strange characters in column ------> this should be as a def in m_ac
+    df['question_bbi_2016wave4_basicincome_effect'] = get_serie_at_split_str_at_char(ser= df['question_bbi_2016wave4_basicincome_effect'],
+                                                                                     char= 'Û_ ')
+    # Creating a list of series as an iterable, getting separate polls_info as iter and saving them into zip
+    list_of_separated_polls = []
+    for column, file_name in zip(cols, files_names):
+        separated_polls = get_separate_df(serie_to_eval= df[column],
+                                          separator_string= sep,
+                                          path_to_save_to= 'data/processed/',
+                                          file_name= file_name)
+        list_of_separated_polls.append(separated_polls)
 
-        print(f'..Beginning saving separated polls')
-        # Save tables into local folder
+    return list_of_separated_polls
 
 
-        m_ac.save_df_to_csv(df_poll_basicincome_effect,
-                       path='data/processed',                   # Function adds hierarchy of files
-                       name=f'poll_basicincome_effect')         # Name of csv
 
-        m_ac.save_df_to_csv(df_poll_basicincome_vote,
-                       path='data/processed',                   # Function adds hierarchy of files
-                       name=f'poll_basicincome_vote')           # Name of csv
-
-        m_ac.save_df_to_csv(df_poll_basicincome_argumentsagainst,
-                       path='data/processed',                     # Function adds hierarchy of files
-                       name=f'poll_basicincome_argumentsagainst') # Name of csv
-
-        m_ac.save_df_to_csv(df_poll_basicincome_argumentsfor,
-                       path='data/processed',                   # Function adds hierarchy of files
-                       name=f'poll_basicincome_argumentsfor')   # Name of csv
-
-    except:
-        print('Something went wrong with [acquire_table_personal_info]') # Make a log file
-
-    finally:
-        print('''\n\t\t\t  >> Done cleaning df_poll_info!. 
-                 \t\t\t  >> Chekout /data/processed/''')
