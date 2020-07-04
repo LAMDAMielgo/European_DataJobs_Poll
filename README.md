@@ -1,55 +1,54 @@
-# Data Project README file
+## [IH] Data Project [M1 DATA MADPT 2020]
 
-The README file describes the essence of the project playing the most important role. Most visitors will simply scroll down about twice on the README and leave if they are not interested. So, the README file should provide the reason **why** to checkout your project!!!). 
-Bearing that in mind, your job is to: 
-- Tell them what it is (with context).
-- Show them what it looks like in action.
-- Show them how they use it.
-- Tell them any other relevant details.
-
-![Image](https://res.cloudinary.com/springboard-images/image/upload/q_auto,f_auto,fl_lossy/wordpress/2019/05/aiexcerpt.png)
+![Image](https://res.cloudinary.com/dute7e5ne/image/upload/v1593836752/portada_git_yjbtc6.png)
 
 ---
 
-## **Formatting**
-Your readers will most likely view your README in a browser so please keep that in mind when formatting its content: 
-- Use proper format when necesary (e.g.: `import pandas as pd`). 
-- Categorize content using two or three levels of header beneath. 
-- Make use of **emphasis** to call out important words. 
-- Link to project pages for related libraries you mention. Link to Wikipedia, Wiktionary, even Urban Dictionary definitions for words of which a reader may not be familiar. Make amusing cultural references. 
-- Add links to related projects or services. 
+### :pushpin: **About**
+This program will produce responses for the challenges ask for the final exercise in Module 1 of Data Analytics in IronHack's Bootcamp [PT2020]
 
-> Here you have a markdown cheatsheet [Link](https://commonmark.org/help/) and tutorial [Link](https://commonmark.org/help/tutorial/).
+This is an exercise on constructing a DATA PIPELINE, showcasing the programming skills and tools acquired in the first module of the program:
+> ''A data pipeline views all data as streaming data and it allows for flexible schemas. Regardless of whether it comes from static sources or from real-time sources, the data pipeline divides each data stream into smaller chunks that it processes in parallel, conferring extra computing power.'''
 
+#### Data Sources
 
-## **Start writing ASAP:**
-*Last but not least, by writing your README soon you give yourself some pretty significant advantages. Most importantly, you’re giving yourself a chance to think through the project without the overhead of having to change code every time you change your mind about how something should be organized or what should be included.*
+* Tables (.db). In the following link you can find the .db file with the main dataset:
+* API. The projects used the API from [Open SKills Project](http://dataatwork.org/data/)
+* Web Scraping. The project retrieves information about ISO 3166 alpha2 code in [Wikipedia](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) and from [World Health Organization](https://www.euro.who.int/en/countries) to get the desired countries inside Europe.
 
 
-## **Suggested Structure:**
-
-### :raising_hand: **Name** 
-Self-explanatory names are best. If the name sounds too vague or unrelated, it may be a signal to move on. It also must be catchy. Images, Logo, Gif or some color is strongly recommended.
-
-### :baby: **Status**
-Alpha, Beta, 1.1, Ironhack Data Analytics Final Project, etc... It's OK to write a sentence, too. The goal is to let interested people know where this project is at.
-
-### :running: **One-liner**
-Having a one-liner that describes the pipeline/api/app is useful for getting an idea of what your code does in slightly greater detail. 
+![Image](https://res.cloudinary.com/dute7e5ne/image/upload/v1593836752/estructura_git_adymbf.png)
 
 ### :computer: **Technology stack**
-Python, Pandas, Scipy, Scikit-learn, etc. Indicate the technological nature of the software, including primary programming language(s), main libraries and whether the software is intended as standalone or as a module in a framework or other ecosystem.
+As a prerequisite, the programming lenguage of this repository is Python 3.7.3, therefore must have Python 3 installed.
+- Argparse
+- Datetime
+- Os
+- Functools
+- Concurrent.futures
+- Re
 
-### :boom: **Core technical concepts and inspiration**
-Why does it exist? Frame your project for the potential user. Compare/contrast your project with other, similar projects so the user knows how it is different from those projects. Highlight the technical concepts that your project demonstrates or supports. Keep it very brief.
+Furthermore, it is need to be installed in the proper environment the following libraries:
+- SQL Alchemy (v.1.3.17)
+- Pandas (v.0.24.2)
+- Numpy (v.1.18.1)
+- Requests (v.2.23.0)
+- Beautiful Soup (v.4.9.1)
+- Scikit-learn (v.0.23.1)
+- Matplotlib (v.3.1.2)
 
-### :wrench: **Configuration**
-Requeriments, prerequisites, dependencies, installation instructions.
 
-### :see_no_evil: **Usage**
-Parameters, return values, known issues, thrown errors.
+#### Status
+Version 1.0 [04.07.2020] > First version done for class presentation
 
-### :file_folder: **Folder structure**
+
+### :wrench: **How to Use**
+1. Download the repo (make sure you have fulfilled the prerequisites).
+2. Run the function \ main_script.py \ and set a valid argument. There is only the option for a country argument. If the country is not in the generated information retrieved from the web sources, the program will exit at the beginning.
+
+#### :file_folder: **Folder structure**
+The folder structure follows the template given in class, generating as many files as necessary inside each package.
+
 ```
 └── project
     ├── __trash__
@@ -59,41 +58,32 @@ Parameters, return values, known issues, thrown errors.
     ├── README.md
     ├── main_script.py
     ├── notebooks
-    │   ├── notebook1.ipynb
-    │   └── notebook2.ipynb
-    ├── package1
-    │   ├── module1.py
-    │   └── module2.py
+    │   ├── acquisition.ipynb
+    │   └── wrangling.ipynb
+    ├── package_acquisition
+    │   ├── module_acquisition.py
+    │   └── module_cleaning.py
+    ├── package_wrangling
+    │   ├── module_awrangling.py
+    ├── package_analysis
+    │   ├── module_analysis.py
+    ├── package_reporting
+    │   ├── module_reporting.py
     └── data
         ├── raw
+             ├── ddbb
         ├── processed
+             ├── (here you will find each ddbb table cleaned)
         └── results
+             ├── df_percentage_by_job_and_gender.csv
+             ├── df_top_skills.csv
+             ├── viz_distribution_top_skills.png
+             ├── viz_distribution_basic_income.png
+
 ```
 
-> Do not forget to include `__trash__` and `.env` in `.gitignore` 
-
-### :shit: **ToDo**
-Next steps, features planned, known bugs (shortlist).
-
-### :information_source: **Further info**
-Credits, alternatives, references, license.
-
 ### :love_letter: **Contact info**
-Getting help, getting involved, hire me please.
+linkedin.com/in/lauramielgo for inqueries.
 
 ---
-
-> Here you have some repo examples:
-- [Mamba (OCR-Translator-Assistant)](https://github.com/YonatanRA/OCR-translator-assistant-project)
-- [Art Classification](https://github.com/serguma/art_classification)
-- [OSNet-IBN (width x 1.0) Lite](https://github.com/RodMech/OSNet-IBN1-Lite)
-- [Movie Founder](https://github.com/Alfagu/final-project-Ironhack-0419mad)
-- [Convolutional Neural Network to detect Pneumonia](https://github.com/jmolins89/final-project)
-- [Brain tumor detection project](https://github.com/alonsopdani/brain-tumor-detection-project)
-- [Policy-Gradient-Methods](https://github.com/cyoon1729/Policy-Gradient-Methods)
-
-> Here you have some tools and references:
-- [Make a README](https://www.makeareadme.com/)
-- [Awesome README](https://github.com/matiassingers/awesome-readme)
-- [Markdown Cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
 

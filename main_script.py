@@ -41,7 +41,6 @@ def main(some_args):
         print(f'\t\t >> proceeding to exit')
         time.sleep(3)
         exit()
-
 #-------------------------------------------------------------------
 if __name__ == '__main__':
     print(f'''
