@@ -17,7 +17,7 @@ This is an exercise on constructing a DATA PIPELINE, showcasing the programming 
 * Web Scraping. The project retrieves information about ISO 3166 alpha2 code in [Wikipedia](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) and from [World Health Organization](https://www.euro.who.int/en/countries) to get the desired countries inside Europe.
 
 
-![Image](https://res.cloudinary.com/dute7e5ne/image/upload/v1593836752/estructura_git_adymbf.png)
+![Image](https://res.cloudinary.com/dute7e5ne/image/upload/v1593847547/structure_sp8y9f.png)
 
 ### :computer: **Technology stack**
 As a prerequisite, the programming lenguage of this repository is Python 3.7.3, therefore must have Python 3 installed.
