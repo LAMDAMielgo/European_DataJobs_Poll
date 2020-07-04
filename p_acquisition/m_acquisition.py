@@ -5,26 +5,21 @@ import re
 from datetime import datetime
 from sklearn.preprocessing import OneHotEncoder
 from functools import reduce
-
+#-------------------------------------------------------------------------------- global variables
+PATH_TO_GET_DDBB_CONNECTION= 'data/raw/raw_data_project_m1.db'
 #-------------------------------------------------------------------------------- functions for connection t ddbb
-
 def connect_to_table(ddbb):
     print(f'Creating DDBB connection..')
     engine = create_engine(f'sqlite:///{ddbb}')
     connection = engine.connect()
-
     return engine
 
 def ddbb_tables(engine):
     """
     Given a connection to a ddbb return tables as list
     """
-    print(f'Getting table names...')
-
     connection = engine.connect()
     ddbb_table_names = engine.table_names()
-
-    print(f'Done. Table names -> {ddbb_table_names}')
     return ddbb_table_names
 
 def fetch_all_from_tables(engine, table_names_from_ddbb):
@@ -39,7 +34,24 @@ def fetch_all_from_tables(engine, table_names_from_ddbb):
 
     return list_of_df
 
+def get_ddbb(ddbb_path=PATH_TO_GET_DDBB_CONNECTION):
+    """ddbb_path = 'data/raw/raw_data_project_m1.db'"""
+
+    table_names = ddbb_tables(connect_to_table(ddbb_path))
+    list_of_raw_dfs = fetch_all_from_tables(engine=connect_to_table(ddbb_path),
+                                             table_names_from_ddbb=table_names)
+    print(f'''Created connection with DDBB
+                  Table names -> \t{table_names}''')
+    return list_of_raw_dfs
 #-------------------------------------------------------------------------------- functions for number standarization
+def list_to_string(elemnt_eval):
+    if len(elemnt_eval) > 1 and isinstance(elemnt_eval,list):
+        composed_str = ' '.join([arg for arg in elemnt_eval])
+        return composed_str
+    elif len(elemnt_eval) == 1 and isinstance(elemnt_eval,list):
+        return elemnt_eval[0]
+    elif isinstance(elemnt_eval, str):
+        return elemnt_eval
 
 def ageStr_to_ageNum(serie):
     """
@@ -69,9 +81,7 @@ def year_update(serie):
     year_db = 2016
     serie = serie.apply(lambda x: (year_now - year_db) + x)
     return serie
-
 #-------------------------------------------------------------------------------- functions for string standarization
-
 def null_to_unknown(serie):
     """
     INPUT  -> no  high     None  medium     None  low  no
@@ -119,6 +129,12 @@ def split_str_at_char(str_to_split, cutter):
     else:
         print('EntryError [at split_str_at_char]: wrong type of inputs')
 
+def get_serie_at_split_str_at_char(ser, char):
+    return [split_str_at_char(response, char)
+                                   if re.search(char, response)
+                                   else response
+                                   for response in ser]
+
 def yes_no_to_bool(serie):
     """
     Appliable to yes/no questions with multiple formats, to transform into boolean info
@@ -129,9 +145,7 @@ def yes_no_to_bool(serie):
     serie = serie.apply(lambda x: re.sub('^y\w+|^Y\w+', '1', x))
     serie = serie.apply(lambda x: re.sub('^n\w+|^N\w+', '0', x)).astype(int)
     return serie.astype(bool)
-
 #-------------------------------------------------------------------------------- functions for number standarization
-
 def separate_df_to_bools(df, cols_to_separate, cols_separated):
     """
     INPUT  -> df[col].unique() = [range_1, range_2, range_3]
@@ -141,9 +155,7 @@ def separate_df_to_bools(df, cols_to_separate, cols_separated):
     df_encoder = OneHotEncoder(dtype=bool, sparse=True)
     df = pd.DataFrame(df_encoder.fit_transform(df[cols_to_separate]).toarray(), columns=cols_separated)
     return df
-
 #---------------------------------- all of this is only for polls_info!
-
 def get_uniqueResponses(serie, separator):
     """
     This function searches for the uniques responses in a multiple choice response
@@ -156,7 +168,7 @@ def get_uniqueResponses(serie, separator):
         if isinstance(separator, str):
             list_of_all_responses = set()
 
-            print(f' ·· Getting Unique values in [poll_column]')
+            print(f' ·· Getting Unique values in poll_info[column]')
             flattened_list_of_responses = reduce(lambda x, y: x + y,
                                                  [item.split(separator) for item in serie.unique()])
 
@@ -181,7 +193,7 @@ def to_binary_matrix_of_equals(list_uniques, list_to_eval):
 
     OUTPUT:   matrix [[1,0,0], [1,0,1], [1,1,1]]
     """
-    print(f' ··· Initiating binary matrix of  [poll_column]')
+    print(f' ··· Initiating binary matrix of  poll_info[column]')
 
     list_uniques_lenghts = [len(i) for i in list_uniques]
 
@@ -215,7 +227,7 @@ def multiple_choice_col_to_df(serie, separator):
     Makes all the operations to return a boolean df with all the possible responses from each poll
     Nested functions : get_uniqueResponses()   to_binany_matrix_of_equals()
     """
-    print(f'\n ·· Creating DFs from [poll_column]')
+    print(f'\n ·· Creating DF from a poll_info column')
     poll_info_allResponses = get_uniqueResponses(serie, separator)
     graph_list_of_responses = serie.apply(lambda x: x.split(separator))
     bin_matrix = to_binary_matrix_of_equals(poll_info_allResponses, graph_list_of_responses)
@@ -223,15 +235,11 @@ def multiple_choice_col_to_df(serie, separator):
     print(f' ·· DF for answers created')
 
     return df
-
 #-------------------------------------------------------------------------------- functions to save outputs
-
 def save_df_to_csv(df, path, name):
     print(f' ·· Saving df in {path} as {name}')
     path = './' + f'{path}'
     return df.to_csv(f'{path}/{name}.csv')
 
-def save_img_to_folder():
-    pass
 
 

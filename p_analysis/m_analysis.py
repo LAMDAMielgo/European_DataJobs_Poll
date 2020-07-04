@@ -1,38 +1,16 @@
 import pandas as pd
 from functools import reduce
+
 from p_acquisition import m_acquisition as m_ac
-
-def get_base_analysis_df(country_argument, list_of_clean_df):
-    """
-    Returns base_df for analysis after evaluating country argument
-    """
-    # list_of_clean_df = [df_career_info, df_country_info, df_personal_info] from main
-    dfs = [
-        list_of_clean_df[1][['uuid', 'country_names']],
-        list_of_clean_df[2][['uuid', 'gender']],
-        list_of_clean_df[0][
-            ['uuid', 'normalized_job_names', 'dem_full_time_job', 'High_Ed', 'Low_Ed', 'Medium_Ed', 'No_Ed']]
-        ]
-
-    df_final = reduce(lambda left, right: pd.merge(left, right, on='uuid'), dfs)
-    print(country_argument)
-    country = ' '.join([arg for arg in country_argument])
-    return country_argparse_filter(country.capitalize(), df_final)
-
 #-------------------------------------------------------------------------------- Evals country_argparse
 def country_argparse_eval(country_argument, list_to_search):
     """
     Evaluates whether argument exists in df_country_info[country_names]
     """
-    print(f'\t ··· Validating country argparse')
-
     if country_argument in list_to_search:
-        print(f'\t\t >> country_argument found in ddbb')
         def_country_argument = country_argument
         return def_country_argument
-
     else:
-        print(f'\t\t >> country_argument not found')
         def_country_argument = ""
         return def_country_argument
 
@@ -49,18 +27,32 @@ def country_argparse_filter(country_argument, analysis_df):
         return analysis_df[analysis_df['country_names'] == c_arg]
 
 #-------------------------------------------------------------------------------- Creating First table (Jobs-Gender)
+def get_base_analysis_df(country_argument, list_of_clean_df):
+    """
+    Returns base_df for analysis after evaluating country argument
+    """
+    # list_of_clean_df = [df_career_info, df_country_info, df_personal_info] from main
+    dfs = [
+        list_of_clean_df[1][['uuid', 'country_names']],
+        list_of_clean_df[2][['uuid', 'gender']],
+        list_of_clean_df[0][
+            ['uuid', 'normalized_job_names', 'dem_full_time_job', 'High_Ed', 'Low_Ed', 'Medium_Ed', 'No_Ed']]
+        ]
+
+    df_final = reduce(lambda left, right: pd.merge(left, right, on='uuid'), dfs)
+    return country_argparse_filter(country_argument, df_final)
+
 def get_percentages_gender_by_job(base_analysis_df):
     """
-    This function solves the main
+    INPUT  -> from all cleaned dfs, joined useful columns by uuid
+    OUTPUT -> csv with percentages by country, job and gender
     """
 
     # Variables.
     filtr = ['country_names', 'normalized_job_names', 'gender']
-
     drop_cols = ['uuid', 'dem_full_time_job',
                  'High_Ed', 'Low_Ed', 'Medium_Ed', 'No_Ed',
                  'totals_per_country']
-
     new_cols = ['quantity', 'percentage']
 
     # Add first col = quantity
@@ -69,14 +61,12 @@ def get_percentages_gender_by_job(base_analysis_df):
                                     .groupby(filtr) \
                                     .agg('count') \
                                     .reset_index()
-
     # Generate totals_per_country
     df_total_per_country = df_job_gender.groupby(filtr[0]) \
                                         [filtr[1]] \
                                         .nunique() \
                                         .to_frame() \
                                         .rename(columns={filtr[1]: drop_cols[-1]})
-
     df_job_gender = df_job_gender.merge(df_total_per_country, on=filtr[0])
 
     # Add second col == percentage and deleting totals_per_country when not need
@@ -87,6 +77,7 @@ def get_percentages_gender_by_job(base_analysis_df):
     m_ac.save_df_to_csv(df_job_gender,
                         path='data/results',  # Function adds hierarchy of files
                         name=f'df_percentage_by_job_and_gender')  # Name of csv
+
     return df_job_gender
 
 #-------------------------------------------------------------------------------- Bonus 1: Top Skills: Quizá meter esto en REPORTING
@@ -115,13 +106,13 @@ def top_skills_by_ed_level(base_analysis_df, number_skills, ed_level, gender_to_
     df_high_ed_skills_gender.sort_values(by=['counts'], ascending=False, inplace=True)
     counts_by_gender = df_high_ed_skills_gender['counts'].tolist()
 
-    pd = df_high_ed_skills_gender[filtr].reset_index().head(number_skills)
-
-    pd = pd.rename(columns={filtr: ed_level}).drop(columns='index')
+    # Getting DF w/ top skills and DF w/counts
+    df_tk = df_high_ed_skills_gender[filtr].reset_index().head(number_skills)
+    df_tk = df_tk.rename(columns={filtr: ed_level}).drop(columns='index')
     counts = counts_by_gender[:number_skills]
 
     # returns tuple
-    return pd, counts
+    return df_tk, counts
 
 def get_df_top_skills(country_argument, num_top_skills, list_dfs_cleaned, gender="All"):
     # Variables
@@ -161,4 +152,43 @@ def get_df_top_skills(country_argument, num_top_skills, list_dfs_cleaned, gender
                         name=f'df_top_skills')  # Name of csv
     return df_to_save, result_counts, gender
 
-#-------------------------------------------------------------------------------- Bonus 1: Top Skills
+#-------------------------------------------------------------------------------- Bonus 2: Poll Information
+def get_df_poll_filtered_by_gender(tuple_separated_polls, poll_to_extract, base_analysis_df):
+    """
+    INPUT  ->  [poll_1, poll_2, poll_3, poll_4] + 'poll_3'    -> data cleaned as extracted
+    OUTPUT ->  in poll_3, list of trues responses by gender   -> data for visualization
+    """
+    # Function variables
+    possible_cols = tuple_separated_polls[1]
+    list_separated_polls_df = tuple_separated_polls[0]
+    gender = ('M', 'F') # this needs to change, buuut
+
+    try:
+        if poll_to_extract in possible_cols:
+            index_of_df = possible_cols.index(poll_to_extract)
+            df_poll = list_separated_polls_df[index_of_df]
+
+            # important columns
+            cols_poll = list(df_poll.columns)
+
+            df_joined = base_analysis_df[['uuid', 'gender']].join(df_poll, on=None, how='left', sort=False)
+
+            # getting data for visualize
+            list_of_lists = []
+
+            for gender_name in gender:
+                list_of_counts = []
+
+                for i in range(len(cols_poll)):
+                    list_of_counts.append(df_joined[df_joined['gender'] == gender_name][cols_poll[i]].value_counts())
+
+                list_of_trues = [list_of_counts[i].iloc[1] for i in range(len(list_of_counts))]
+                list_of_lists.append(list_of_trues)
+
+            return dict(zip(gender, list_of_lists)), cols_poll, index_of_df
+
+        else:
+            raise ValueError
+
+    except ValueError:
+        print('The entry [poll_to_extract] is not correct')

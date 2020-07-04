@@ -22,25 +22,29 @@ def get_dictEuropeanCountries():
     soup = BeautifulSoup(html_eurocountries, 'lxml')
     table = soup.find_all('section', {'class': 'clearfix'})
 
-    all_contries = [content.text for content in table]
-    eu_countries = list(filter(None, all_contries[0].split('\n')))
+    all_countries = [content.text for content in table]
+    eu_countries = list(filter(None, all_countries[0].split('\n')))
 
     european_countries_values = [val for k, val in countries_dict.items() for eu_c in eu_countries if val == eu_c]
     european_countries_key = [k for k, val in countries_dict.items() for eu_c in eu_countries if val == eu_c]
 
-    return dict(zip(european_countries_key, european_countries_values))
+    europeancountries_dict = dict(zip(european_countries_key, european_countries_values))
 
-def countryCode_to_countryName(serie):
+    # Changing United Kingdom
+    europeancountries_dict.pop('GB')
+    europeancountries_dict['GB'] = 'United Kingdom'
+
+    return europeancountries_dict
+
+def countryCode_to_countryName(serie, dict):
     """
     INPUT   ->       AT      FR     ES   ->  alpha_2 code
     OUTPUT  ->  Austria  France  Spain   ->  full name in dict form
     """
-    print('\t ··· Fetching European countries from web scrapping')
-    country_dictionary = get_dictEuropeanCountries()
-
+    country_dictionary = dict
     return serie.apply(lambda x: country_dictionary[str(x)])
 
-def add_country_col(df_to_change):
+def add_country_col(df_to_change, countries_dict):
     """
     Transforms DF and adds a Col with WEB Information, saves it and returns it
     """
@@ -53,7 +57,7 @@ def add_country_col(df_to_change):
     print(f'\n\n· Adding column to csv located at {path}....')
     try:
         # Action to apply
-        df_to_change[col_name_to_add] = countryCode_to_countryName(serie=df_to_change[col_name_reference])
+        df_to_change[col_name_to_add] = countryCode_to_countryName(serie=df_to_change[col_name_reference], dict= countries_dict)
 
         # Save table into local folder
         print(f'\t ··· ready to rewrite..')
