@@ -179,5 +179,3 @@ The folder structure follows the template given in class, generating as many fil
 
 ```
 
-### :bookmark: **Code Beauty Pageant**
-
