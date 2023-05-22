@@ -5,5 +5,5 @@ Scikit-learn==0.23.1
 Sqlalchemy==1.3.17
 Numpy==1.18.1
 Sklearn==0.0
-Requests==2.23.0
+Requests==2.31.0
 Beautifulsoup4==4.9.1
